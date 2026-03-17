@@ -112,6 +112,89 @@ function useDebouncedValue(value, delayMs) {
   return debounced;
 }
 
+function useThemePreference() {
+  const [themeMode, setThemeMode] = useState(() => {
+    if (typeof window === "undefined") {
+      return "system";
+    }
+    return window.localStorage.getItem("mentor-theme-mode") || "system";
+  });
+  const [prefersDark, setPrefersDark] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (event) => setPrefersDark(event.matches);
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  const resolvedTheme =
+    themeMode === "system" ? (prefersDark ? "dark" : "light") : themeMode;
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = resolvedTheme;
+    window.localStorage.setItem("mentor-theme-mode", themeMode);
+  }, [resolvedTheme, themeMode]);
+
+  return { themeMode, setThemeMode };
+}
+
+function parseStructuredSummary(summary) {
+  if (!summary) {
+    return [];
+  }
+
+  const pattern =
+    /(Lesson|Task|Assessment|Gap|Tutor action):\s*([\s\S]*?)(?=(?:Lesson|Task|Assessment|Gap|Tutor action):|$)/gi;
+  const items = [];
+
+  for (const match of summary.matchAll(pattern)) {
+    items.push({
+      label: match[1],
+      value: match[2].trim().replace(/\.$/, ""),
+    });
+  }
+
+  return items;
+}
+
+function ThemeSwitcher({ themeMode, onChange }) {
+  const options = [
+    { label: "Light", value: "light" },
+    { label: "Dark", value: "dark" },
+    { label: "System", value: "system" },
+  ];
+
+  return (
+    <div className="theme-switcher" role="group" aria-label="Theme mode">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          className={
+            themeMode === option.value
+              ? "theme-switcher__button theme-switcher__button--active"
+              : "theme-switcher__button"
+          }
+          onClick={() => onChange(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function AnimatedNumber({ value, suffix = "" }) {
   const [displayValue, setDisplayValue] = useState(0);
   const previousValueRef = useRef(0);
@@ -215,6 +298,25 @@ function SummaryPanel({ summary }) {
         </div>
       </section>
     </article>
+  );
+}
+
+function SummaryDetails({ summary }) {
+  const items = parseStructuredSummary(summary);
+
+  if (items.length === 0) {
+    return <p className="lead lead--compact">{summary}</p>;
+  }
+
+  return (
+    <dl className="definition-list">
+      {items.map((item) => (
+        <div key={`${item.label}-${item.value}`} className="definition-list__item">
+          <dt>{item.label}</dt>
+          <dd>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -387,7 +489,7 @@ function DetailDrawer({ selectedDate, studentId, apiBase, onClose }) {
 
                   <section className="drawer__section">
                     <h3>Latest mentor note</h3>
-                    <p className="lead lead--compact">{detail.latest_summary}</p>
+                    <SummaryDetails summary={detail.latest_summary} />
                   </section>
 
                   <section className="drawer__section">
@@ -399,9 +501,7 @@ function DetailDrawer({ selectedDate, studentId, apiBase, onClose }) {
                             <span className="reason-badge">{report.trigger_reason}</span>
                             <span>{formatTimestamp(report.timestamp)}</span>
                           </div>
-                          <p className="report-entry__summary">
-                            {report.ai_reasoning_summary}
-                          </p>
+                          <SummaryDetails summary={report.ai_reasoning_summary} />
                           <div className="report-entry__context">
                             <span>
                               <strong>File:</strong> {report.file_path || "Unknown"}
@@ -430,6 +530,7 @@ function DetailDrawer({ selectedDate, studentId, apiBase, onClose }) {
 export default function App() {
   const apiBase = useMemo(() => deriveApiBase(dataEndpoint), []);
   const today = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+  const { themeMode, setThemeMode } = useThemePreference();
   const [selectedDate, setSelectedDate] = useState(today);
   const [studentQuery, setStudentQuery] = useState("");
   const [attentionOnly, setAttentionOnly] = useState(false);
@@ -444,6 +545,7 @@ export default function App() {
 
   const summaryQuery = useQuery({
     queryKey: ["group-summary", selectedDate],
+    placeholderData: (previousData) => previousData,
     queryFn: () =>
       fetchJson(
         buildApiUrl(apiBase, "/group-summary", {
@@ -455,6 +557,7 @@ export default function App() {
   const reportsQuery = useInfiniteQuery({
     queryKey: ["daily-reports", selectedDate, debouncedSearch, attentionOnly],
     initialPageParam: null,
+    placeholderData: (previousData) => previousData,
     queryFn: ({ pageParam }) =>
       fetchJson(
         buildApiUrl(apiBase, "/daily-reports", {
@@ -505,17 +608,28 @@ export default function App() {
     () => reportDates.map((item) => parseDayValue(item)).filter(Boolean),
     [reportDates],
   );
+  const isInitialLoading =
+    (summaryQuery.isPending && !summaryQuery.data) ||
+    (reportsQuery.isPending && reportCards.length === 0);
+  const isRefreshing = summaryQuery.isFetching || reportsQuery.isFetching;
 
   return (
     <main className="app-shell">
       <section className="hero">
-        <div>
-          <p className="eyebrow">Mentor dashboard</p>
-          <h1>Read the day summary, then scan students without losing your place.</h1>
-          <p className="hero__copy">
-            We moved the working controls closer to the student cards so mentors can
-            search, filter, and switch dates while staying in the same review area.
-          </p>
+        <div className="hero__header">
+          <div>
+            <p className="eyebrow">Mentor dashboard</p>
+            <h1>Read the day summary, then scan students without losing your place.</h1>
+            <p className="hero__copy">
+              We moved the working controls closer to the student cards so mentors can
+              search, filter, and switch dates while staying in the same review area.
+            </p>
+          </div>
+
+          <div className="hero__theme">
+            <span>Theme</span>
+            <ThemeSwitcher themeMode={themeMode} onChange={setThemeMode} />
+          </div>
         </div>
       </section>
 
@@ -536,7 +650,7 @@ export default function App() {
         </div>
       </section>
 
-      {summaryQuery.isLoading || reportDatesQuery.isLoading ? (
+      {isInitialLoading || reportDatesQuery.isLoading ? (
         <section className="notice">
           <strong>Preparing the mentor dashboard...</strong>
           <p>Loading summary insights, dates, and report cards.</p>
@@ -550,7 +664,7 @@ export default function App() {
         </section>
       ) : null}
 
-      {!summaryQuery.isLoading && !reportsQuery.isLoading && !summaryQuery.isError ? (
+      {!summaryQuery.isError ? (
         <>
           <section className="stats-grid">
             <StatCard
@@ -628,15 +742,23 @@ export default function App() {
                   />
                 </label>
 
-                <label className="toggle-field">
+                <label className="toggle-field" htmlFor="attention-only">
                   <input
+                    id="attention-only"
                     type="checkbox"
                     checked={attentionOnly}
                     onChange={(event) => setAttentionOnly(event.target.checked)}
                   />
-                  <span>Show only students who need more attention</span>
+                  <span className="toggle-field__switch" aria-hidden="true" />
+                  <span>Attention only</span>
                 </label>
               </div>
+
+              {isRefreshing ? (
+                <div className="cards-updating">
+                  <span>Updating results...</span>
+                </div>
+              ) : null}
 
               {reportCards.length === 0 && !reportsQuery.isFetching ? (
                 <div className="empty-state">

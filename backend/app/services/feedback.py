@@ -280,6 +280,37 @@ def _extract_report_date(timestamp_value: Any) -> date | None:
 
 
 def _extract_key_concepts(rows: list[dict[str, Any]]) -> list[str]:
+    structured_gap_counts: Counter[str] = Counter()
+    structured_lesson_counts: Counter[str] = Counter()
+    structured_labels: dict[str, str] = {}
+
+    for row in rows:
+        summary = row.get("ai_reasoning_summary") or ""
+
+        gap_value = _extract_structured_field(summary, "Gap")
+        if gap_value:
+            normalized_gap = _normalize_phrase(gap_value)
+            structured_gap_counts[normalized_gap] += 1
+            structured_labels.setdefault(normalized_gap, gap_value.strip())
+
+        lesson_value = _extract_structured_field(summary, "Lesson")
+        if lesson_value:
+            normalized_lesson = _normalize_phrase(lesson_value)
+            structured_lesson_counts[normalized_lesson] += 1
+            structured_labels.setdefault(normalized_lesson, lesson_value.strip())
+
+    if structured_gap_counts:
+        return [
+            structured_labels[key]
+            for key, _count in structured_gap_counts.most_common(5)
+        ]
+
+    if structured_lesson_counts:
+        return [
+            structured_labels[key]
+            for key, _count in structured_lesson_counts.most_common(5)
+        ]
+
     token_counts: Counter[str] = Counter()
     stop_words = {
         "the",
@@ -326,6 +357,21 @@ def _extract_key_concepts(rows: list[dict[str, Any]]) -> list[str]:
                 token_counts[word.replace("_", " ")] += 1
 
     return [word for word, _count in token_counts.most_common(5)]
+
+
+def _extract_structured_field(summary: str, field_name: str) -> str | None:
+    pattern = re.compile(
+        rf"{re.escape(field_name)}:\s*(.+?)(?=(?:Lesson|Task|Assessment|Gap|Tutor action):|$)",
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    match = pattern.search(summary)
+    if not match:
+        return None
+    return match.group(1).strip().rstrip(".")
+
+
+def _normalize_phrase(value: str) -> str:
+    return re.sub(r"\s+", " ", value.strip().lower())
 
 
 def _build_recommended_actions(top_reasons: list[dict[str, Any]]) -> list[str]:

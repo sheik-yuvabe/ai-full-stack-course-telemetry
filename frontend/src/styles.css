@@ -23,6 +23,24 @@
   --rose-soft: #f4d7dd;
 }
 
+:root[data-theme="dark"] {
+  color: #eef2f7;
+  background:
+    radial-gradient(circle at top left, rgba(104, 76, 32, 0.24), transparent 26%),
+    linear-gradient(180deg, #121720 0%, #0d1219 100%);
+  --paper: rgba(18, 23, 32, 0.92);
+  --paper-strong: #171d27;
+  --ink-soft: #c6d0de;
+  --border: rgba(187, 201, 223, 0.16);
+  --shadow: 0 24px 56px rgba(0, 0, 0, 0.32);
+  --accent: #df9a48;
+  --accent-soft: rgba(223, 154, 72, 0.16);
+  --sage: #7db699;
+  --sage-soft: rgba(125, 182, 153, 0.18);
+  --rose: #e78c9b;
+  --rose-soft: rgba(231, 140, 155, 0.18);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -69,6 +87,24 @@ input[type="checkbox"] {
   grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   align-items: start;
+}
+
+.hero__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.hero__theme {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.hero__theme span {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
 }
 
 .eyebrow,
@@ -122,6 +158,28 @@ input[type="checkbox"] {
   box-shadow: var(--shadow);
 }
 
+.theme-switcher {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.theme-switcher__button {
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 10px 14px;
+  border-radius: 999px;
+}
+
+.theme-switcher__button--active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
 .status-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -142,6 +200,16 @@ input[type="checkbox"] {
 .score-item span {
   color: var(--ink-soft);
   font-size: 0.88rem;
+}
+
+:root[data-theme="dark"] .status-strip strong,
+:root[data-theme="dark"] .student-card__identity strong,
+:root[data-theme="dark"] .section-heading h2,
+:root[data-theme="dark"] .summary-block h3,
+:root[data-theme="dark"] .definition-list__item dt,
+:root[data-theme="dark"] .drawer h2,
+:root[data-theme="dark"] .stat-card strong {
+  color: #f7f9fc;
 }
 
 .status-strip strong {
@@ -187,9 +255,6 @@ input[type="checkbox"] {
 
 .cards-toolbar {
   grid-template-columns: 1fr 1fr auto;
-  position: sticky;
-  top: 16px;
-  z-index: 5;
   margin-top: 18px;
   padding: 16px;
   border-radius: 20px;
@@ -270,11 +335,45 @@ input[type="checkbox"] {
   margin: 0 0 12px;
 }
 
+.summary-block {
+  display: grid;
+  align-content: start;
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--paper-strong);
+}
+
 .summary-list,
 .cards-grid,
 .report-stack {
   display: grid;
   gap: 12px;
+}
+
+.definition-list {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 0;
+}
+
+.definition-list__item {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--paper-strong);
+  border: 1px solid var(--border);
+}
+
+.definition-list__item dt {
+  font-weight: 700;
+}
+
+.definition-list__item dd {
+  margin: 0;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
 }
 
 .cards-grid {
@@ -301,6 +400,11 @@ input[type="checkbox"] {
   border-radius: 16px;
 }
 
+.summary-chip strong,
+.action-row span {
+  overflow-wrap: anywhere;
+}
+
 .summary-chip--concept {
   justify-content: flex-start;
 }
@@ -322,25 +426,59 @@ input[type="checkbox"] {
   padding: 12px 14px;
   border: 1px solid rgba(122, 95, 59, 0.16);
   border-radius: 14px;
-  background: #fffdf8;
+  background: var(--paper-strong);
   color: inherit;
+}
+
+.react-datepicker-wrapper input {
+  cursor: pointer;
 }
 
 .toggle-field {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto 1fr;
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.64);
+  background: rgba(255, 255, 255, 0.18);
   cursor: pointer;
 }
 
 .toggle-field input {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--accent);
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-field__switch {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(122, 95, 59, 0.18);
+  transition: background 160ms ease;
+}
+
+.toggle-field__switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fffdf8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transition: transform 160ms ease;
+}
+
+.toggle-field input:checked + .toggle-field__switch {
+  background: rgba(79, 124, 102, 0.4);
+}
+
+.toggle-field input:checked + .toggle-field__switch::after {
+  transform: translateX(22px);
 }
 
 .student-card {
@@ -473,6 +611,12 @@ input[type="checkbox"] {
   font-size: 0.92rem;
 }
 
+.cards-updating {
+  margin-top: 14px;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
 .empty-state {
   margin-top: 18px;
   padding: 20px;
@@ -594,8 +738,28 @@ input[type="checkbox"] {
 }
 
 .react-datepicker__header {
-  background: #fcf6ea;
+  background: var(--paper-strong);
   border-bottom: 1px solid rgba(122, 95, 59, 0.08);
+}
+
+:root[data-theme="dark"] .react-datepicker,
+:root[data-theme="dark"] .react-datepicker__header,
+:root[data-theme="dark"] .react-datepicker__month-container {
+  background: var(--paper-strong);
+  color: #eef2f7;
+}
+
+:root[data-theme="dark"] .react-datepicker__current-month,
+:root[data-theme="dark"] .react-datepicker-time__header,
+:root[data-theme="dark"] .react-datepicker-year-header,
+:root[data-theme="dark"] .react-datepicker__day-name,
+:root[data-theme="dark"] .react-datepicker__day,
+:root[data-theme="dark"] .react-datepicker__navigation-icon::before {
+  color: #eef2f7;
+}
+
+:root[data-theme="dark"] .react-datepicker__day:hover {
+  background: rgba(223, 154, 72, 0.18);
 }
 
 .react-datepicker__day,
@@ -623,6 +787,15 @@ input[type="checkbox"] {
 
   .panel--summary {
     position: static;
+  }
+
+  .hero__header {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .hero__theme {
+    justify-items: start;
   }
 
   .hero h1 {
