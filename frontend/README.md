@@ -1,37 +1,52 @@
 # Telemetry Frontend
 
-This frontend is a Streamlit dashboard for viewing telemetry events produced by the backend API.
+This frontend is a React + Vite dashboard for reviewing daily telemetry reports produced by the backend API.
 
-The repository-level `.gitignore` already ignores `.env`, `.venv`, `venv`, and other local-only files, so your frontend secrets and virtual environment stay out of git.
+The repository-level `.gitignore` already ignores `.env`, virtual environments, `node_modules`, and build output, so local frontend configuration stays out of git.
 
 ## Structure
 
 ```text
 frontend/
   README.md
-  requirements.txt
+  package.json
+  index.html
+  vite.config.js
   src/
-    app.py
-    telemetry_frontend/
-      api.py
-      config.py
-      dashboard.py
+    main.jsx
+    App.jsx
+    styles.css
 ```
 
 ## Local setup
 
 ```powershell
 Copy-Item .env.example .env
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-streamlit run src/app.py
+npm install
+npm run dev
 ```
+
+Vite serves the app at `http://127.0.0.1:5173` by default.
 
 ## Configuration
 
-The app loads `frontend/.env` automatically. Set `BACKEND_API_URL` there if you want the dashboard to point to a local backend instead of the deployed Hugging Face endpoint.
+Set `VITE_BACKEND_API_URL` in `frontend/.env` if you want the dashboard to point to a local backend instead of the deployed Hugging Face endpoint.
 
 ```powershell
-BACKEND_API_URL=http://127.0.0.1:8000/api/data
+VITE_BACKEND_API_URL=http://127.0.0.1:8000/api/data
+```
+
+The app derives the daily review endpoints from that base data URL:
+
+- `/api/report-dates`
+- `/api/daily-reports?report_date=YYYY-MM-DD&cursor=...&limit=8`
+- `/api/student-report-detail?report_date=YYYY-MM-DD&student_id=...`
+- `/api/group-summary?report_date=YYYY-MM-DD`
+
+The UI defaults to the current date, uses a proper date picker, loads student cards with infinite scroll, and opens full report details in a drawer on demand.
+
+## Production build
+
+```powershell
+npm run build
 ```

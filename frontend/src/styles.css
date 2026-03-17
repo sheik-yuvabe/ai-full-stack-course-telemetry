@@ -1,0 +1,650 @@
+:root {
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  color: #1e2933;
+  background:
+    radial-gradient(circle at top left, rgba(240, 191, 118, 0.22), transparent 26%),
+    linear-gradient(180deg, #fffef8 0%, #f6f1e7 100%);
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --paper: rgba(255, 252, 245, 0.9);
+  --paper-strong: #fffdf8;
+  --ink-soft: #6b6458;
+  --border: rgba(122, 95, 59, 0.14);
+  --shadow: 0 24px 56px rgba(109, 81, 38, 0.12);
+  --accent: #a76417;
+  --accent-soft: #f8e3c5;
+  --sage: #4f7c66;
+  --sage-soft: #dcecdf;
+  --rose: #aa5362;
+  --rose-soft: #f4d7dd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  cursor: text;
+}
+
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.app-shell {
+  width: min(1420px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 40px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.eyebrow,
+.section-heading p {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: var(--accent);
+}
+
+.hero h1,
+.section-heading h2,
+.drawer h2 {
+  margin: 0;
+  letter-spacing: -0.04em;
+}
+
+.hero h1 {
+  max-width: 16ch;
+  font-size: clamp(2.6rem, 5vw, 4.5rem);
+  line-height: 0.98;
+}
+
+.hero__copy,
+.lead,
+.notice p,
+.empty-state p,
+.student-card__identity p,
+.report-entry__summary,
+.muted {
+  color: var(--ink-soft);
+}
+
+.hero__copy {
+  max-width: 64ch;
+  margin: 16px 0 0;
+  font-size: 1rem;
+}
+
+.status-strip,
+.panel,
+.stat-card,
+.notice,
+.student-card,
+.drawer,
+.report-entry,
+.cards-toolbar {
+  border: 1px solid var(--border);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.status-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 22px;
+}
+
+.status-strip span,
+.stat-card span,
+.cards-count,
+.student-card__meta span,
+.report-entry__meta span,
+.report-entry__context span,
+.field span,
+.toggle-field span,
+.score-item span {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.status-strip strong {
+  display: block;
+  margin-top: 4px;
+  word-break: break-word;
+}
+
+.notice {
+  margin-top: 18px;
+  padding: 22px;
+  border-radius: 22px;
+}
+
+.notice--error {
+  border-color: rgba(170, 83, 98, 0.25);
+}
+
+.stats-grid,
+.review-grid,
+.summary-grid,
+.drawer__stats,
+.cards-toolbar {
+  display: grid;
+  gap: 18px;
+}
+
+.stats-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.review-grid {
+  grid-template-columns: minmax(320px, 0.86fr) minmax(0, 1.14fr);
+  align-items: start;
+  margin-top: 18px;
+}
+
+.summary-grid,
+.drawer__stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cards-toolbar {
+  grid-template-columns: 1fr 1fr auto;
+  position: sticky;
+  top: 16px;
+  z-index: 5;
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.panel,
+.stat-card,
+.student-card {
+  border-radius: 26px;
+}
+
+.panel {
+  padding: 22px;
+}
+
+.panel--summary {
+  position: sticky;
+  top: 18px;
+}
+
+.panel--cards {
+  min-height: 60vh;
+}
+
+.section-heading--inline {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stat-card {
+  padding: 20px;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.7rem, 2.8vw, 2.3rem);
+  letter-spacing: -0.05em;
+}
+
+.stat-card small {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink-soft);
+}
+
+.stat-card--sage {
+  background: linear-gradient(180deg, var(--sage-soft), var(--paper-strong));
+}
+
+.stat-card--rose {
+  background: linear-gradient(180deg, var(--rose-soft), var(--paper-strong));
+}
+
+.stat-card--gold {
+  background: linear-gradient(180deg, var(--accent-soft), var(--paper-strong));
+}
+
+.lead {
+  margin: 14px 0 0;
+  font-size: 1rem;
+}
+
+.lead--compact {
+  margin-top: 10px;
+}
+
+.summary-block + .summary-block,
+.drawer__section + .drawer__section {
+  margin-top: 20px;
+}
+
+.summary-block h3,
+.drawer__section h3 {
+  margin: 0 0 12px;
+}
+
+.summary-list,
+.cards-grid,
+.report-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.cards-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.summary-chip,
+.action-row,
+.student-card,
+.report-entry,
+.empty-state {
+  background: var(--paper-strong);
+}
+
+.summary-chip,
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(122, 95, 59, 0.12);
+  border-radius: 16px;
+}
+
+.summary-chip--concept {
+  justify-content: flex-start;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field input,
+.react-datepicker-wrapper,
+.react-datepicker__input-container,
+.react-datepicker__input-container input {
+  width: 100%;
+}
+
+.field input,
+.react-datepicker-wrapper input {
+  padding: 12px 14px;
+  border: 1px solid rgba(122, 95, 59, 0.16);
+  border-radius: 14px;
+  background: #fffdf8;
+  color: inherit;
+}
+
+.toggle-field {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.64);
+  cursor: pointer;
+}
+
+.toggle-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.student-card {
+  border: 1px solid rgba(122, 95, 59, 0.12);
+  padding: 18px;
+  text-align: left;
+  transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.student-card:hover {
+  border-color: rgba(167, 100, 23, 0.3);
+}
+
+.student-card__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.student-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.student-card__identity {
+  min-width: 0;
+}
+
+.student-card__identity strong {
+  font-size: 1.08rem;
+}
+
+.student-card__identity p {
+  margin: 8px 0 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.student-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  color: #fffef8;
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.avatar--large {
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+}
+
+.attention-badge,
+.reason-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+}
+
+.attention-badge {
+  background: var(--rose-soft);
+  color: var(--rose);
+}
+
+.attention-badge--calm {
+  background: var(--sage-soft);
+  color: var(--sage);
+}
+
+.reason-badge {
+  background: var(--accent-soft);
+  color: #8a5316;
+}
+
+.trigger-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.score-row {
+  margin-top: 16px;
+}
+
+.score-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(122, 95, 59, 0.1);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--sage), #79b18d);
+}
+
+.load-more {
+  display: grid;
+  place-items: center;
+  min-height: 54px;
+  margin-top: 18px;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.empty-state {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px dashed rgba(122, 95, 59, 0.22);
+  border-radius: 20px;
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(33, 28, 22, 0.24);
+  backdrop-filter: blur(4px);
+  z-index: 30;
+  cursor: pointer;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(560px, 100vw);
+  height: 100vh;
+  padding: 22px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 31;
+}
+
+.drawer__content {
+  width: 100%;
+  min-width: 0;
+}
+
+.drawer__close {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #efe5d5;
+  color: inherit;
+  margin-left: auto;
+  display: block;
+}
+
+.drawer__hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+.drawer__hero-copy {
+  min-width: 0;
+}
+
+.drawer__hero-copy h2 {
+  overflow-wrap: anywhere;
+}
+
+.drawer__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.drawer__stats {
+  margin-top: 20px;
+}
+
+.drawer__section {
+  margin-top: 24px;
+}
+
+.drawer__loading {
+  margin-top: 20px;
+}
+
+.report-entry {
+  width: 100%;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 20px;
+}
+
+.report-entry__meta,
+.report-entry__context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.report-entry__summary {
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+
+.report-entry__code {
+  width: 100%;
+  min-width: 0;
+  margin: 14px 0 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: #fcf7ee;
+  overflow-x: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  font-family: "IBM Plex Mono", "Cascadia Code", monospace;
+  font-size: 0.9rem;
+  color: #4b3921;
+}
+
+.react-datepicker {
+  border: 1px solid rgba(122, 95, 59, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 22px 40px rgba(88, 68, 34, 0.14);
+  overflow: hidden;
+}
+
+.react-datepicker__header {
+  background: #fcf6ea;
+  border-bottom: 1px solid rgba(122, 95, 59, 0.08);
+}
+
+.react-datepicker__day,
+.react-datepicker__navigation {
+  cursor: pointer;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: var(--accent);
+}
+
+.react-datepicker__day--highlighted {
+  background: var(--sage-soft);
+  color: var(--sage);
+}
+
+@media (max-width: 1160px) {
+  .stats-grid,
+  .review-grid,
+  .cards-grid,
+  .cards-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .panel--summary {
+    position: static;
+  }
+
+  .hero h1 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    width: min(100% - 20px, 1420px);
+    padding-top: 20px;
+  }
+
+  .status-strip,
+  .summary-grid,
+  .drawer__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .student-card__title-row,
+  .student-card__meta {
+    flex-direction: column;
+    align-items: start;
+  }
+}
