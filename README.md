@@ -2,16 +2,16 @@
 
 This repository contains a small telemetry system for AI-assisted coding education:
 
-- A FastAPI backend that receives telemetry events and stores them in SQLite
-- A Streamlit frontend that shows those events in a simple dashboard
-- A Codex helper script and instruction file used to send telemetry when a student is stuck
+- A FastAPI backend that receives tutor-facing telemetry reports and stores them in SQLite
+- A React + Vite frontend designed for daily mentor review
+- A Codex helper script and instruction file used to send curriculum-grounded learning reports
 
 ## Main use cases
 
-- Detect when a student is blocked by compiler errors, repeated failures, or conceptual doubts
-- Send a small telemetry payload with student ID, reason, summary, file path, and code excerpt
-- View recent interventions in a dashboard for mentors, instructors, or curriculum owners
-- Use those signals to identify recurring student pain points and improve teaching material
+- Summarize a student's understanding of the current lesson instead of logging every isolated error
+- Send a compact tutor report with student ID, reason, summary, file path, and code excerpt
+- Review daily student reports by date, then read a grouped cohort summary before drilling into individuals
+- Save sent telemetry locally for later sharing and prompt refinement
 
 ## Repository structure
 
@@ -26,7 +26,7 @@ ai-full-stack-course-telemetry/
 
 ## Codex setup
 
-This workflow assumes you are using Codex in your local environment and want telemetry to be sent automatically when students ask for help and the agent detects they are stuck.
+This workflow assumes you are using Codex in your local environment and want telemetry to be sent automatically when students need help and the agent has enough evidence to produce a useful learning report.
 
 ### Codex access
 
@@ -78,9 +78,9 @@ BACKEND_URL = "http://127.0.0.1:8000/feedback"
 
 1. A student asks for help in Codex.
 2. Codex follows the instructions in `$HOME/.codex/AGENTS.md`.
-3. If the student appears stuck, Codex runs `$HOME/.codex/telemetry.py`.
-4. `telemetry.py` sends the telemetry payload to your backend `/feedback` endpoint.
-5. The backend stores the event and the frontend dashboard displays it.
+3. When there is enough evidence for a meaningful tutor note, Codex runs `$HOME/.codex/telemetry.py`.
+4. `telemetry.py` sends the telemetry payload to your backend `/feedback` endpoint and also archives it locally in `$HOME/.codex/telemetry_exports/`.
+5. The backend stores the report and the frontend dashboard displays both daily individual reports and a grouped summary.
 
 ## Clone the project
 
@@ -114,10 +114,8 @@ In a second terminal:
 ```powershell
 cd frontend
 Copy-Item .env.example .env
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-streamlit run src/app.py
+npm install
+npm run dev
 ```
 
 Detailed frontend instructions:
@@ -126,13 +124,14 @@ Detailed frontend instructions:
 ## Local development flow
 
 - Start the backend on `http://127.0.0.1:8000`
-- Point the frontend `BACKEND_API_URL` in `frontend/.env` to `http://127.0.0.1:8000/api/data`
-- Open the Streamlit app in the browser
-- Send telemetry events through `telemetry.py` or the backend API
-- Watch the dashboard update with incoming data
+- Point the frontend `VITE_BACKEND_API_URL` in `frontend/.env` to `http://127.0.0.1:8000/api/data`
+- Open the Vite app at `http://127.0.0.1:5173`
+- Send telemetry reports through `telemetry.py` or the backend API
+- Review the daily summary first, then expand the student reports for that date
 
 ## Notes
 
 - `.env` files, virtual environments, and the SQLite database are already ignored by git
 - `frontend/.env` controls the backend API URL used by the dashboard
 - `backend/.env` controls the SQLite path and CORS settings used by the API
+- `$HOME/.codex/telemetry_exports/` stores a local JSONL archive of submitted telemetry sessions

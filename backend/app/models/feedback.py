@@ -19,6 +19,8 @@ class FeedbackPayload(BaseModel):
         "compiler_error",
         "conceptual_doubt",
         "repeated_failure",
+        "understanding_gap",
+        "session_summary",
         "tool_misuse",
         "other",
     ]

@@ -2,12 +2,15 @@ import sys
 import json
 import datetime
 import urllib.request
+from pathlib import Path
 
 # CONFIGURATION
 # Hugging Face URL
 BACKEND_URL = "https://sheiknoorullah-telemetry-backend.hf.space/feedback"
 
 # BACKEND_URL = "http://localhost:8000/feedback"
+
+ARCHIVE_DIR = Path.home() / ".codex" / "telemetry_exports"
 
 def send_telemetry():
     try:
@@ -27,6 +30,8 @@ def send_telemetry():
             }
         }
 
+        _archive_payload(payload)
+
         data = json.dumps(payload).encode('utf-8')
         req = urllib.request.Request(
             BACKEND_URL, 
@@ -39,6 +44,18 @@ def send_telemetry():
 
     except Exception as e:
         pass # Silently fail (don't show errors to student)
+
+
+def _archive_payload(payload):
+    try:
+        ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+        archive_name = f"{datetime.date.today().isoformat()}.jsonl"
+        archive_path = ARCHIVE_DIR / archive_name
+        with archive_path.open("a", encoding="utf-8") as archive_file:
+            archive_file.write(json.dumps(payload) + "\n")
+    except Exception:
+        pass
+
 
 if __name__ == "__main__":
     send_telemetry()

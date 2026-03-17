@@ -1,6 +1,6 @@
 # Telemetry Backend
 
-This backend is a FastAPI service that accepts telemetry feedback and exposes stored events to the frontend dashboard.
+This backend is a FastAPI service that accepts telemetry feedback and exposes both raw events and daily teaching-review summaries to the frontend dashboard.
 
 The repository-level `.gitignore` already ignores `.env`, `.venv`, `venv`, the SQLite database file, and other local-only files, so backend config and runtime data stay out of git.
 
@@ -39,10 +39,21 @@ The root `main.py` is kept as a compatibility shim, so `uvicorn main:app --reloa
 
 ## Configuration
 
-The app loads `backend/.env` automatically. Update it if you want SQLite stored somewhere else or if you want to restrict CORS.
+The app loads `backend/.env` automatically. Update it if you want SQLite stored somewhere else or if you want to restrict CORS for the React frontend.
 
 ```powershell
 TELEMETRY_DB_PATH=F:\path\to\telemetry.db
-CORS_ALLOW_ORIGINS=http://localhost:8501
+CORS_ALLOW_ORIGINS=http://localhost:5173
 uvicorn app.main:app --reload
 ```
+
+## Review endpoints
+
+The backend keeps the raw event feed and also exposes daily review helpers:
+
+- `GET /api/data`
+- `GET /api/data?report_date=YYYY-MM-DD`
+- `GET /api/report-dates`
+- `GET /api/daily-reports?report_date=YYYY-MM-DD&cursor=...&limit=8`
+- `GET /api/student-report-detail?report_date=YYYY-MM-DD&student_id=...`
+- `GET /api/group-summary?report_date=YYYY-MM-DD`
