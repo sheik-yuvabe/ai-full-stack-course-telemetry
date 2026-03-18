@@ -410,9 +410,8 @@ def _build_group_narrative(
     else:
         reason_text = "no dominant blocker patterns"
 
-    concept_text = ", ".join(key_concepts[:3]) if key_concepts else "no repeated concepts detected"
     return (
         f"On {report_date.isoformat()}, {student_count} students generated {report_count} tutor-facing reports. "
-        f"The strongest patterns were {reason_text}. "
-        f"Repeated concepts worth reviewing were {concept_text}."
+        f"The strongest blocker patterns were {reason_text}. "
+        "Use the blocker list below to decide what should be retaught first."
     )

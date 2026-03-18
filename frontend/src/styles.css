@@ -208,7 +208,8 @@ input[type="checkbox"] {
 :root[data-theme="dark"] .summary-block h3,
 :root[data-theme="dark"] .definition-list__item dt,
 :root[data-theme="dark"] .drawer h2,
-:root[data-theme="dark"] .stat-card strong {
+:root[data-theme="dark"] .stat-card strong,
+:root[data-theme="dark"] .score-item strong {
   color: #f7f9fc;
 }
 
@@ -251,6 +252,11 @@ input[type="checkbox"] {
 .summary-grid,
 .drawer__stats {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.summary-grid {
+  margin-top: 18px;
+  align-items: stretch;
 }
 
 .cards-toolbar {
@@ -325,6 +331,18 @@ input[type="checkbox"] {
   margin-top: 10px;
 }
 
+.summary-callout {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(167, 100, 23, 0.08), var(--paper-strong));
+  border: 1px solid rgba(122, 95, 59, 0.12);
+}
+
+.summary-callout .lead {
+  margin: 0;
+}
+
 .summary-block + .summary-block,
 .drawer__section + .drawer__section {
   margin-top: 20px;
@@ -338,17 +356,31 @@ input[type="checkbox"] {
 .summary-block {
   display: grid;
   align-content: start;
+  align-self: stretch;
   padding: 16px;
   border-radius: 20px;
   border: 1px solid var(--border);
   background: var(--paper-strong);
+  min-height: 100%;
+}
+
+.summary-block--blockers {
+  margin-top: 18px;
+}
+
+.summary-block__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 
 .summary-list,
 .cards-grid,
 .report-stack {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .definition-list {
@@ -398,6 +430,7 @@ input[type="checkbox"] {
   padding: 12px 14px;
   border: 1px solid rgba(122, 95, 59, 0.12);
   border-radius: 16px;
+  line-height: 1.45;
 }
 
 .summary-chip strong,
@@ -405,8 +438,65 @@ input[type="checkbox"] {
   overflow-wrap: anywhere;
 }
 
-.summary-chip--concept {
+.action-row {
   justify-content: flex-start;
+}
+
+.summary-chip strong {
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.summary-chip span {
+  flex-shrink: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+:root[data-theme="dark"] .summary-callout {
+  background: linear-gradient(180deg, rgba(223, 154, 72, 0.14), var(--paper-strong));
+}
+
+:root[data-theme="dark"] .reason-badge {
+  color: #f8e7d1;
+  border-color: rgba(223, 154, 72, 0.18);
+}
+
+:root[data-theme="dark"] .reason-badge--understanding-gap {
+  background: rgba(231, 140, 155, 0.22);
+  color: #ffd5dd;
+  border-color: rgba(231, 140, 155, 0.24);
+}
+
+:root[data-theme="dark"] .reason-badge--conceptual-doubt {
+  background: rgba(223, 154, 72, 0.2);
+  color: #ffe0b3;
+  border-color: rgba(223, 154, 72, 0.24);
+}
+
+:root[data-theme="dark"] .reason-badge--session-summary {
+  background: rgba(125, 182, 153, 0.2);
+  color: #d8f1e4;
+  border-color: rgba(125, 182, 153, 0.24);
+}
+
+:root[data-theme="dark"] .reason-badge--repeated-failure {
+  background: rgba(231, 140, 155, 0.28);
+  color: #ffdbe3;
+  border-color: rgba(231, 140, 155, 0.28);
+}
+
+:root[data-theme="dark"] .reason-badge--compiler-error {
+  background: rgba(255, 177, 138, 0.2);
+  color: #ffd6c2;
+  border-color: rgba(255, 177, 138, 0.24);
+}
+
+:root[data-theme="dark"] .reason-badge--other,
+:root[data-theme="dark"] .reason-badge--tool-misuse {
+  background: rgba(187, 201, 223, 0.14);
+  color: #dde5f1;
+  border-color: rgba(187, 201, 223, 0.2);
 }
 
 .field {
@@ -568,6 +658,44 @@ input[type="checkbox"] {
 .reason-badge {
   background: var(--accent-soft);
   color: #8a5316;
+  border: 1px solid rgba(167, 100, 23, 0.18);
+}
+
+.reason-badge--understanding-gap {
+  background: rgba(231, 140, 155, 0.16);
+  color: #9d4053;
+  border-color: rgba(170, 83, 98, 0.18);
+}
+
+.reason-badge--conceptual-doubt {
+  background: rgba(223, 154, 72, 0.16);
+  color: #8a5316;
+  border-color: rgba(167, 100, 23, 0.18);
+}
+
+.reason-badge--session-summary {
+  background: rgba(125, 182, 153, 0.18);
+  color: #356b55;
+  border-color: rgba(79, 124, 102, 0.18);
+}
+
+.reason-badge--repeated-failure {
+  background: rgba(231, 140, 155, 0.24);
+  color: #8e3146;
+  border-color: rgba(170, 83, 98, 0.22);
+}
+
+.reason-badge--compiler-error {
+  background: rgba(255, 177, 138, 0.2);
+  color: #9b4a23;
+  border-color: rgba(180, 92, 48, 0.18);
+}
+
+.reason-badge--other,
+.reason-badge--tool-misuse {
+  background: rgba(122, 95, 59, 0.12);
+  color: #705941;
+  border-color: rgba(122, 95, 59, 0.16);
 }
 
 .trigger-strip {
@@ -587,6 +715,10 @@ input[type="checkbox"] {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+}
+
+.score-item strong {
+  color: #2b2419;
 }
 
 .progress-track {

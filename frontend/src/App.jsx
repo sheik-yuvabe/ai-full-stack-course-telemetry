@@ -50,6 +50,17 @@ function formatDayLabel(value) {
   return parsed ? format(parsed, "dd MMM yyyy") : "Unknown";
 }
 
+function formatTriggerLabel(value) {
+  return (value || "other")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function getReasonBadgeClass(reason) {
+  const normalizedReason = (reason || "other").toLowerCase().replace(/_/g, "-");
+  return `reason-badge reason-badge--${normalizedReason}`;
+}
+
 function formatTimestamp(value) {
   if (!value) {
     return "Unknown";
@@ -91,9 +102,10 @@ function buildAvatarGradient(seed) {
     ["#ffd8c2", "#ee9b73"],
     ["#d8f0ef", "#5ea39a"],
   ];
-  const index = (seed || "")
-    .split("")
-    .reduce((total, char) => total + char.charCodeAt(0), 0) % palettes.length;
+  const index =
+    (seed || "")
+      .split("")
+      .reduce((total, char) => total + char.charCodeAt(0), 0) % palettes.length;
   const [start, end] = palettes[index];
   return `linear-gradient(135deg, ${start}, ${end})`;
 }
@@ -234,7 +246,11 @@ function StatCard({
     <article className={`stat-card stat-card--${tone}`}>
       <span>{label}</span>
       <strong>
-        {animated ? <AnimatedNumber value={Number(value) || 0} suffix={suffix} /> : value}
+        {animated ? (
+          <AnimatedNumber value={Number(value) || 0} suffix={suffix} />
+        ) : (
+          value
+        )}
       </strong>
       <small>{detail}</small>
     </article>
@@ -249,40 +265,31 @@ function SummaryPanel({ summary }) {
         <h2>What the mentor should read first</h2>
       </div>
 
-      <p className="lead">
-        {summary?.narrative || "No group summary is available for this day."}
-      </p>
+      <section className="summary-callout">
+        <p className="lead">
+          {summary?.narrative || "No group summary is available for this day."}
+        </p>
+      </section>
 
-      <div className="summary-grid">
-        <section className="summary-block">
+      <section className="summary-block summary-block--blockers">
+        <div className="summary-block__header">
           <h3>Top blocker patterns</h3>
-          <div className="summary-list">
-            {(summary?.top_reasons || []).map((item) => (
-              <div key={item.reason} className="summary-chip">
-                <strong>{item.reason}</strong>
-                <span>{item.count} reports</span>
-              </div>
-            ))}
-            {!summary?.top_reasons?.length ? (
-              <p className="muted">No blocker patterns detected.</p>
-            ) : null}
-          </div>
-        </section>
-
-        <section className="summary-block">
-          <h3>Repeated concepts</h3>
-          <div className="summary-list">
-            {(summary?.key_concepts || []).map((item) => (
-              <div key={item} className="summary-chip summary-chip--concept">
-                <strong>{item}</strong>
-              </div>
-            ))}
-            {!summary?.key_concepts?.length ? (
-              <p className="muted">No recurring concepts detected.</p>
-            ) : null}
-          </div>
-        </section>
-      </div>
+          <span className="muted">
+            Most repeated report reasons for this day
+          </span>
+        </div>
+        <div className="summary-list">
+          {(summary?.top_reasons || []).map((item) => (
+            <div key={item.reason} className="summary-chip">
+              <strong>{item.reason}</strong>
+              <span>{item.count} reports</span>
+            </div>
+          ))}
+          {!summary?.top_reasons?.length ? (
+            <p className="muted">No blocker patterns detected.</p>
+          ) : null}
+        </div>
+      </section>
 
       <section className="summary-block">
         <h3>Recommended tutor actions</h3>
@@ -311,7 +318,10 @@ function SummaryDetails({ summary }) {
   return (
     <dl className="definition-list">
       {items.map((item) => (
-        <div key={`${item.label}-${item.value}`} className="definition-list__item">
+        <div
+          key={`${item.label}-${item.value}`}
+          className="definition-list__item"
+        >
           <dt>{item.label}</dt>
           <dd>{item.value}</dd>
         </div>
@@ -344,7 +354,9 @@ function StudentCard({ report, onOpen }) {
             {report.needs_attention ? (
               <span className="attention-badge">Needs attention</span>
             ) : (
-              <span className="attention-badge attention-badge--calm">Stable</span>
+              <span className="attention-badge attention-badge--calm">
+                Stable
+              </span>
             )}
           </div>
           <p>{report.latest_summary}</p>
@@ -360,8 +372,11 @@ function StudentCard({ report, onOpen }) {
 
       <div className="trigger-strip">
         {report.triggers.slice(0, 3).map((trigger) => (
-          <span key={trigger.reason} className="reason-badge">
-            {trigger.reason} - {trigger.count}
+          <span
+            key={trigger.reason}
+            className={getReasonBadgeClass(trigger.reason)}
+          >
+            {formatTriggerLabel(trigger.reason)} - {trigger.count}
           </span>
         ))}
       </div>
@@ -441,7 +456,9 @@ function DetailDrawer({ selectedDate, studentId, apiBase, onClose }) {
                   <div className="drawer__hero">
                     <div
                       className="avatar avatar--large"
-                      style={{ backgroundImage: buildAvatarGradient(detail.student_id) }}
+                      style={{
+                        backgroundImage: buildAvatarGradient(detail.student_id),
+                      }}
                     >
                       <span>{getInitials(detail.student_id)}</span>
                     </div>
@@ -449,9 +466,17 @@ function DetailDrawer({ selectedDate, studentId, apiBase, onClose }) {
                       <p className="eyebrow">Student report</p>
                       <h2>{detail.student_id}</h2>
                       <div className="drawer__badges">
-                        <span className="reason-badge">{detail.latest_trigger_reason}</span>
+                        <span
+                          className={getReasonBadgeClass(
+                            detail.latest_trigger_reason,
+                          )}
+                        >
+                          {formatTriggerLabel(detail.latest_trigger_reason)}
+                        </span>
                         {detail.needs_attention ? (
-                          <span className="attention-badge">Needs attention</span>
+                          <span className="attention-badge">
+                            Needs attention
+                          </span>
                         ) : (
                           <span className="attention-badge attention-badge--calm">
                             Stable
@@ -498,20 +523,32 @@ function DetailDrawer({ selectedDate, studentId, apiBase, onClose }) {
                       {detail.reports.map((report) => (
                         <article key={report.id} className="report-entry">
                           <div className="report-entry__meta">
-                            <span className="reason-badge">{report.trigger_reason}</span>
+                            <span
+                              className={getReasonBadgeClass(
+                                report.trigger_reason,
+                              )}
+                            >
+                              {formatTriggerLabel(report.trigger_reason)}
+                            </span>
                             <span>{formatTimestamp(report.timestamp)}</span>
                           </div>
-                          <SummaryDetails summary={report.ai_reasoning_summary} />
+                          <SummaryDetails
+                            summary={report.ai_reasoning_summary}
+                          />
                           <div className="report-entry__context">
                             <span>
-                              <strong>File:</strong> {report.file_path || "Unknown"}
+                              <strong>File:</strong>{" "}
+                              {report.file_path || "Unknown"}
                             </span>
                             <span>
-                              <strong>Lines:</strong> {report.line_range || "N/A"}
+                              <strong>Lines:</strong>{" "}
+                              {report.line_range || "N/A"}
                             </span>
                           </div>
                           <pre className="report-entry__code">
-                            <code>{report.excerpt || "# No code snippet provided"}</code>
+                            <code>
+                              {report.excerpt || "# No code snippet provided"}
+                            </code>
                           </pre>
                         </article>
                       ))}
@@ -619,11 +656,15 @@ export default function App() {
         <div className="hero__header">
           <div>
             <p className="eyebrow">Mentor dashboard</p>
-            <h1>Read the day summary, then scan students without losing your place.</h1>
-            <p className="hero__copy">
-              We moved the working controls closer to the student cards so mentors can
-              search, filter, and switch dates while staying in the same review area.
-            </p>
+            <h1>
+              Read the day summary, then scan students without losing your
+              place.
+            </h1>
+            {/* <p className="hero__copy">
+              We moved the working controls closer to the student cards so
+              mentors can search, filter, and switch dates while staying in the
+              same review area.
+            </p> */}
           </div>
 
           <div className="hero__theme">
@@ -657,7 +698,9 @@ export default function App() {
         </section>
       ) : null}
 
-      {summaryQuery.isError || reportDatesQuery.isError || reportsQuery.isError ? (
+      {summaryQuery.isError ||
+      reportDatesQuery.isError ||
+      reportsQuery.isError ? (
         <section className="notice notice--error">
           <strong>Unable to load the mentor dashboard.</strong>
           <p>Try refreshing the page or checking the backend connection.</p>
@@ -722,7 +765,9 @@ export default function App() {
                   <DatePicker
                     selected={selectedDateAsDate}
                     onChange={(value) => {
-                      const nextDate = value ? format(value, "yyyy-MM-dd") : today;
+                      const nextDate = value
+                        ? format(value, "yyyy-MM-dd")
+                        : today;
                       setSelectedDate(nextDate);
                       setSelectedStudentId("");
                     }}
@@ -762,10 +807,12 @@ export default function App() {
 
               {reportCards.length === 0 && !reportsQuery.isFetching ? (
                 <div className="empty-state">
-                  <strong>No student reports found for {formatDayLabel(selectedDate)}.</strong>
+                  <strong>
+                    No student reports found for {formatDayLabel(selectedDate)}.
+                  </strong>
                   <p>
-                    Try another day or remove the attention-only filter to widen the
-                    result set.
+                    Try another day or remove the attention-only filter to widen
+                    the result set.
                   </p>
                 </div>
               ) : (
